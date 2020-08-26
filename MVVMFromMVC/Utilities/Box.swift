@@ -1,4 +1,4 @@
-/// Copyright (c) 2019 Razeware LLC
+/// Copyright (c) 2020 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -18,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 /// 
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,30 +31,35 @@
 /// THE SOFTWARE.
 
 import Foundation
-import CoreLocation
 
-class LocationGeocoder {
-  private lazy var geocoder = CLGeocoder()
+// final keyword here implies that this class cannot be inherited
+// these methods cannot be overridden to change behaviour
+
+// <T> type parameter represnets placeholder type, which is replaced with actual type during compile time
+final class Box<T> {
+  // 1
+  typealias Listener = (T) -> Void
+  var listener: Listener?
   
-  ///Convert a place name to a location
-  func geocode(addressString: String, callback: @escaping ([Location]) -> ()) {
-    geocoder.geocodeAddressString(addressString) { (placemarks, error) in
-      var locations: [Location] = []
-      if let error = error {
-        print("Geocoding error: (\(error))")
-      } else {
-        if let placemarks = placemarks {
-          locations = placemarks.compactMap { (placemark) -> Location? in
-            guard let name = placemark.locality, let location = placemark.location else {
-                return nil
-            }
-            let region = placemark.administrativeArea ?? ""
-            let fullName = "\(name), \(region)" 
-            return Location(name: fullName, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
-          }
-        }
-      }
-      callback(locations)
+  //2
+  var value: T {
+    // didSet property observer
+    // observe and respond to change in a property's value
+    // called everytime after a property's value is set
+    didSet {
+      listener?(value)
     }
   }
+  
+  //3
+  init(_ value: T) {
+    self.value = value
+  }
+  
+  //4
+  func bind(listener: Listener?) {
+    self.listener = listener
+    listener?(value)
+  }
 }
+

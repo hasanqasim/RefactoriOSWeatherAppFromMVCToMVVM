@@ -31,11 +31,15 @@ import UIKit
 class WeatherViewController: UIViewController {
   private let geocoder = LocationGeocoder()
   private let defaultAddress = "McGaheysville, VA"
+  
+  // create string representation of NSDate object
   private let dateFormatter: DateFormatter = {
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "EEEE, MMM d"
     return dateFormatter
   }()
+  
+  // converts between numeric values and their textual representation in a pretty String to display
   private let tempFormatter: NumberFormatter = {
     let tempFormatter = NumberFormatter()
     tempFormatter.numberStyle = .none
@@ -49,13 +53,14 @@ class WeatherViewController: UIViewController {
   @IBOutlet weak var forecastSummary: UITextView!
   
   override func viewDidLoad() {
+    
+    // gecoder takes an address string and converts it into a latitude and longitude location
+    // location is sent to the weather service below
     geocoder.geocode(addressString: defaultAddress) { [weak self] locations in
-      guard
-        let self = self,
-        let location = locations.first
-        else {
+      guard let self = self, let location = locations.first else {
           return
-        }
+      }
+      
       self.cityLabel.text = location.name
       self.fetchWeatherForLocation(location)
     }
@@ -66,20 +71,15 @@ class WeatherViewController: UIViewController {
     WeatherbitService.weatherDataForLocation(
       latitude: location.latitude,
       longitude: location.longitude) { [weak self] (weatherData, error) in
+      
       //2
-      guard
-        let self = self,
-        let weatherData = weatherData
-        else {
+      guard let self = self, let weatherData = weatherData else {
           return
-        }
-      self.dateLabel.text =
-        self.dateFormatter.string(from: weatherData.date)
+      }
+      self.dateLabel.text = self.dateFormatter.string(from: weatherData.date)
       self.currentIcon.image = UIImage(named: weatherData.iconName)
-      let temp = self.tempFormatter.string(
-        from: weatherData.currentTemp as NSNumber) ?? ""
-      self.currentSummaryLabel.text =
-        "\(weatherData.description) - \(temp)℉"
+      let temp = self.tempFormatter.string(from: weatherData.currentTemp as NSNumber) ?? ""
+      self.currentSummaryLabel.text = "\(weatherData.description) - \(temp)℉"
       self.forecastSummary.text = "\nSummary: \(weatherData.description)"
     }
   }
