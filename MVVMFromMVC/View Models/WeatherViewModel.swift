@@ -99,5 +99,5 @@ public class WeatherViewModel {
       self.forecastSummary.value = "\nSummary: \(weatherData.description)"
     }
   }
-
+  
 }

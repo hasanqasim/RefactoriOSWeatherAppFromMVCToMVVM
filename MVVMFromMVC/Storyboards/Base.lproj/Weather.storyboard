@@ -26,6 +26,9 @@
                                                 <rect key="frame" x="8" y="8" width="22" height="33.5"/>
                                                 <color key="tintColor" name="rw-light"/>
                                                 <state key="normal" image="location.fill" catalog="system"/>
+                                                <connections>
+                                                    <action selector="locationButtonPressed:" destination="o4c-2N-1oK" eventType="touchUpInside" id="LXu-bB-C5I"/>
+                                                </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mc Gaheysville, VA" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Rw-7V-ZDE" userLabel="City">
                                                 <rect key="frame" x="30" y="8" width="299" height="33.5"/>
