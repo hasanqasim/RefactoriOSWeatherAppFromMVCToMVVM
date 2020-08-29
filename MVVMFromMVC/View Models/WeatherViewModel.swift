@@ -1,4 +1,4 @@
-/// Copyright (c) 2019 Razeware LLC
+/// Copyright (c) 2020 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -18,6 +18,10 @@
 /// merger, publication, distribution, sublicensing, creation of derivative works,
 /// or sale is expressly withheld.
 /// 
+/// This project and source code may use libraries or frameworks that are
+/// released under various Open-Source licenses. Use of those libraries and
+/// frameworks are governed by their own individual licenses.
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,38 +30,45 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
-import UIKit
+import Foundation
 
-class WeatherViewController: UIViewController {
+// 1
+import UIKit.UIImage
+
+// 2
+public class WeatherViewModel {
+  private static let defaultAddress = "Caulfield, VIC"
+  private let geocoder = LocationGeocoder()
   
-  private let viewModel = WeatherViewModel()
+  let locationName = Box("Loading...")
   
+  init() {
+    changeLocation(to: Self.defaultAddress)
+  }
   
- 
+  func changeLocation(to newLocation: String) {
+    locationName.value = "Loading..."
+    // gecoder takes an address string and converts it into a latitude and longitude location
+    // location is sent to the weather service below
+    geocoder.geocode(addressString: newLocation) { [weak self] locations in
+      guard let self = self else {
+        return
+      }
+      if let location = locations.first {
+        self.locationName.value = location.name
+        self.fetchWeatherForLocation(location)
+        return
+      }
+    }
+  }
   
-  // create string representation of NSDate object
-  private let dateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "EEEE, MMM d"
-    return dateFormatter
-  }()
-  
-  // converts between numeric values and their textual representation in a pretty String to display
-  private let tempFormatter: NumberFormatter = {
-    let tempFormatter = NumberFormatter()
-    tempFormatter.numberStyle = .none
-    return tempFormatter
-  }()
-  
-  @IBOutlet weak var cityLabel: UILabel!
-  @IBOutlet weak var dateLabel: UILabel!
-  @IBOutlet weak var currentIcon: UIImageView!
-  @IBOutlet weak var currentSummaryLabel: UILabel!
-  @IBOutlet weak var forecastSummary: UITextView!
-  
-  override func viewDidLoad() {
-    viewModel.locationName.bind { [weak self] locationName in
-      self?.cityLabel.text = locationName
+  func fetchWeatherForLocation(_ location: Location) {
+    //1
+    WeatherbitService.weatherDataForLocation(latitude: location.latitude, longitude: location.longitude) { [weak self] (weatherData, error) in
+      //2
+      guard let self = self, let weatherData = weatherData else {
+          return
+      }
     }
   }
 
